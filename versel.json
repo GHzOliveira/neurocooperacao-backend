@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "name": "my-nestjs-app",
+    "builds": [
+      {
+        "src": "Dockerfile",
+        "use": "@vercel/docker"
+      }
+    ]
+  }
