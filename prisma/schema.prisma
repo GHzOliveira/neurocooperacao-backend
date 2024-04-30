@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id      String @id @default(uuid())
+  user    String @unique
+  password String
+
+  @@map("admin")
+}
+
+model Grupo {
+  id     String @id @default(uuid())
+  nome  String @unique
+  gameServerCreated Boolean @default(false) @map("game_server_created")
+  gameRule String? @map("game_rule")
+  rodada Rodada[]
+  user User[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+  
+  @@map("group")
+}
+
+model Rodada {
+  id     String @id @default(uuid())
+  nEuro String
+  retribuicao String
+  qntRetribuicao String
+  nRodada String
+  group  Grupo @relation(fields: [groupId], references: [id])
+  groupId String
+  data   DateTime
+}
+
+model User {
+  id        String @id @default(uuid())
+  nome      String
+  whatsapp  String
+  nEuro    String? @map("n_euro")
+  grupo     Grupo  @relation(fields: [grupoId], references: [id])
+  grupoId   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("user")
+}
