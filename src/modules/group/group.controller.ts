@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -59,5 +60,15 @@ export class GroupController {
     data: { nEuro: string; retribuicao: string; qntRetribuicao: string, nRodada: string },
   ) {
     return this.groupService.updateRound(roundId, data);
+  }
+
+  @Patch(':groupId/applyNEuro')
+  async applyNEuro(@Param('groupId') groupId: string, @Body('nEuro') nEuro: string, @Body('totalUsuarios') totalUsuarios: number) {
+    return this.groupService.applyNEuro(groupId, nEuro, totalUsuarios);
+  }
+
+  @Post(':id/next-round')
+  async nextRound(@Param('id') id: string) {
+    return this.groupService.nextRound(id);
   }
 }

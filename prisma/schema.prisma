@@ -22,6 +22,7 @@ model Grupo {
   gameRule String? @map("game_rule")
   rodada Rodada[]
   user User[]
+  valores Valores[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
   
@@ -50,4 +51,17 @@ model User {
   updatedAt DateTime @default(now()) @map("updated_at")
 
   @@map("user")
+}
+
+model Valores {
+  id             String @id @default(uuid())
+  totalNEuro     String @map("total_n_euro")
+  totalUsuarios  Int    @map("total_usuarios")
+  fundoRetido    String @map("fundo_retido")
+  grupo          Grupo  @relation(fields: [grupoId], references: [id])
+  grupoId        String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("'updated_at")
+
+  @@map("valores")
 }

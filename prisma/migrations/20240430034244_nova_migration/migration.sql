@@ -45,6 +45,19 @@ CREATE TABLE "user" (
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "valores" (
+    "id" TEXT NOT NULL,
+    "total_n_euro" TEXT NOT NULL,
+    "total_usuarios" INTEGER NOT NULL,
+    "fundo_retido" TEXT NOT NULL,
+    "grupoId" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "valores_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "admin_user_key" ON "admin"("user");
 
@@ -56,3 +69,6 @@ ALTER TABLE "Rodada" ADD CONSTRAINT "Rodada_groupId_fkey" FOREIGN KEY ("groupId"
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_grupoId_fkey" FOREIGN KEY ("grupoId") REFERENCES "group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "valores" ADD CONSTRAINT "valores_grupoId_fkey" FOREIGN KEY ("grupoId") REFERENCES "group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
