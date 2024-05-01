@@ -33,6 +33,7 @@ RUN npm ci --only=production
 
 # Copie os arquivos de construção do estágio de construção
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
 
 # Execute as migrações do Prisma
 RUN npx prisma migrate deploy
