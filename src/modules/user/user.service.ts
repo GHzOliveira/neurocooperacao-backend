@@ -37,6 +37,15 @@ export class UserService {
     });
   }
 
+  async updateNEuro(id: string, data: CreateUserDto) {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        nEuro: data.nEuro,
+      },
+    });
+  }
+
   async remove(id: string) {
     return this.prisma.user.delete({ where: { id } });
   }

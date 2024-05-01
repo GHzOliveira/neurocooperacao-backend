@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGroupDto, UpdateGroupDto } from './dto/create-group.dto';
-import { Rodada } from '@prisma/client';
+import { Prisma, Rodada } from '@prisma/client';
 
 @Injectable()
 export class GroupService {
@@ -99,7 +99,23 @@ export class GroupService {
   }
 
   async deleteGroup(id: string) {
-    await this.prisma.user.deleteMany({
+    const users = await this.prisma.user.findMany({
+      where: {
+        grupoId: id,
+      },
+      select: {
+        id: true,
+      },
+    });
+    for (const user of users) {
+      await this.prisma.transaction.deleteMany({
+        where: {
+          userId: user.id,
+        },
+      });
+    }
+    await this.prisma.user.deleteMany
+    ({
       where: {
         grupoId: id,
       },
@@ -114,6 +130,13 @@ export class GroupService {
         grupoId: id,
       },
     });
+    await this.prisma.transaction.deleteMany({
+      where: {
+        user: {
+          grupoId: id,
+        }
+      },
+    })
     return this.prisma.grupo.delete({
       where: {
         id: id,
@@ -130,6 +153,15 @@ export class GroupService {
         nome: data.name,
       },
     });
+  }
+
+  async getValue(groupId: string, field: keyof Prisma.ValoresUncheckedCreateInput): Promise<string | number | null> {
+    const value = await this.prisma.valores.findFirst({
+      where: { grupoId: groupId },
+      select: { [field]: true },
+    });
+  
+    return value ? value[field] : null;
   }
 
   async updateRound(
@@ -154,7 +186,38 @@ export class GroupService {
     });
   }
 
+  async createTransaction(userId: string, roundId: string, transactionType: string, amount: string) {
+    return this.prisma.transaction.create({
+      data: {
+        userId: userId,
+        roundId: roundId,
+        transactionType: transactionType,
+        amount: amount,
+      },
+    });
+  }
+
+  async getTransaction(id: string) {
+    return this.prisma.transaction.findUnique({
+      where: {
+        id: id,
+      },
+    });
+  }
+
   async applyNEuro(groupId: string, nEuro: string, totalUsuarios?: number) {
+    const user = await this.prisma.user.findFirst({
+      where: { grupoId: groupId },
+    });
+
+    if (user && user.nEuro) {
+      const newNEuro = parseFloat(user.nEuro) - parseFloat(nEuro);
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { nEuro: newNEuro.toString() },
+      });
+    }
+
     let valores = await this.prisma.valores.findFirst({
       where: { grupoId: groupId },
     });
@@ -180,6 +243,65 @@ export class GroupService {
     return valores;
   }
 
+  async getNEuroStats(): Promise<{ average: number; median: number; mode: number }> {
+    const users = await this.prisma.user.findMany();
+    const nEuros = users.map(user => parseFloat(user.nEuro));
+  
+    // Calculate average
+    const sum = nEuros.reduce((a, b) => a + b, 0);
+    const average = sum / nEuros.length;
+  
+    // Calculate median
+    nEuros.sort((a, b) => a - b);
+    const mid = Math.floor(nEuros.length / 2);
+    const median = nEuros.length % 2 !== 0 ? nEuros[mid] : (nEuros[mid - 1] + nEuros[mid]) / 2;
+  
+    // Calculate mode
+    const counts = {};
+    for (const nEuro of nEuros) {
+      if (counts[nEuro]) {
+        counts[nEuro]++;
+      } else {
+        counts[nEuro] = 1;
+      }
+    }
+    let mode = nEuros[0];
+    let maxCount = 0;
+    for (const nEuro in counts) {
+      if (counts[nEuro] > maxCount) {
+        maxCount = counts[nEuro];
+        mode = parseFloat(nEuro);
+      }
+    }
+  
+    return { average, median, mode };
+  }
+
+  async updateTotalNEuro() {
+    const rounds = await this.prisma.rodada.findMany({
+      where: {
+        nRodada: {
+          gt: '1'
+        }
+      }
+    });
+  
+    if (rounds.length > 0) {
+      const valores = await this.prisma.valores.findFirst({
+        where: { grupoId: rounds[0].groupId },
+      });
+  
+      if (valores) {
+        const totalNEuro = parseFloat(valores.totalNEuro) + parseFloat(valores.fundoRetido);
+  
+        await this.prisma.valores.update({
+          where: { id: valores.id },
+          data: { totalNEuro: totalNEuro.toString() },
+        });
+      }
+    }
+  }
+
   async nextRound(groupId: string) {
     const valores = await this.prisma.valores.findFirst({
       where: { grupoId: groupId },
@@ -192,9 +314,8 @@ export class GroupService {
     const totalNEuro = parseFloat(valores.totalNEuro);
     const totalUsuarios = valores.totalUsuarios;
     const nEuroPorUsuario = Math.floor(totalNEuro / totalUsuarios);
-    const fundoRetido = (totalNEuro / totalUsuarios - nEuroPorUsuario) * totalUsuarios;
+    const fundoRetido = Math.floor((totalNEuro / totalUsuarios - nEuroPorUsuario) * totalUsuarios);
   
-   
     const rodada = await this.prisma.rodada.findFirst({
       where: { groupId: groupId },
       orderBy: { data: 'desc' },
@@ -214,7 +335,7 @@ export class GroupService {
       if (rodada.retribuicao === 'Valor Inteiro') {
         userNEuro += parseInt(rodada.qntRetribuicao);
       } else if (rodada.retribuicao === 'Porcentagem') {
-        userNEuro += nEuroPorUsuario * (parseInt(rodada.qntRetribuicao) / 100);
+        userNEuro += userNEuro * (parseInt(rodada.qntRetribuicao) / 100);
       }
   
       await this.prisma.user.update({

@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -24,6 +24,13 @@ export class UserController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: CreateUserDto) {
     return this.userService.update(id, updateUserDto);
+  }
+
+  @Patch(':id/nEuro')
+  updateNEuro(@Param('id') id: string, @Body('nEuro') nEuro: string) {
+    const updateUserDto = new CreateUserDto();
+    updateUserDto.nEuro = nEuro;
+    return this.userService.updateNEuro(id, updateUserDto);
   }
 
   @Delete(':id')

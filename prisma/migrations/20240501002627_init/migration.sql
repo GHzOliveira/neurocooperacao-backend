@@ -53,9 +53,21 @@ CREATE TABLE "valores" (
     "fundo_retido" TEXT NOT NULL,
     "grupoId" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "'updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "valores_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "transaction" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "roundId" TEXT NOT NULL,
+    "transactionType" TEXT NOT NULL,
+    "amount" TEXT NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "transaction_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -72,3 +84,6 @@ ALTER TABLE "user" ADD CONSTRAINT "user_grupoId_fkey" FOREIGN KEY ("grupoId") RE
 
 -- AddForeignKey
 ALTER TABLE "valores" ADD CONSTRAINT "valores_grupoId_fkey" FOREIGN KEY ("grupoId") REFERENCES "group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "transaction" ADD CONSTRAINT "transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

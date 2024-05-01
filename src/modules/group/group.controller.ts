@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -11,11 +12,11 @@ import {
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto, UpdateGroupDto } from './dto/create-group.dto';
-import { Rodada } from '@prisma/client';
+import { Prisma, Rodada } from '@prisma/client';
 
 @Controller('group')
 export class GroupController {
-  constructor(private readonly groupService: GroupService) {}
+  constructor(private readonly groupService: GroupService) { }
 
   @Post()
   create(@Body() CreateGrupoDto: CreateGroupDto) {
@@ -43,6 +44,31 @@ export class GroupController {
     return this.groupService.getRoundDetails(groupId, nRodada);
   }
 
+  @Get(':groupId/value/:field')
+  async getValue(@Param('groupId') groupId: string, @Param('field') field: keyof Prisma.ValoresUncheckedCreateInput) {
+    return this.groupService.getValue(groupId, field);
+  }
+
+  @Get('nEuroStats')
+  async getNEuroStats(): Promise<{ average: number; median: number; mode: number }> {
+    return this.groupService.getNEuroStats();
+  }
+
+  @Get(':id/transaction')
+  async getTransaction(@Param('id') id: string) {
+    return this.groupService.getTransaction(id);
+  }
+
+  @Post(':userId/transaction')
+  async createTransaction(
+    @Param('userId') userId: string,
+    @Body('roundId') roundId: string,
+    @Body('transactionType') transactionType: string,
+    @Body('amount') amount: string,
+  ) {
+    return this.groupService.createTransaction(userId, roundId, transactionType, amount);
+  }
+
   @Delete(':id')
   deleteGroup(@Param('id') id: string) {
     return this.groupService.deleteGroup(id);
@@ -65,6 +91,13 @@ export class GroupController {
   @Patch(':groupId/applyNEuro')
   async applyNEuro(@Param('groupId') groupId: string, @Body('nEuro') nEuro: string, @Body('totalUsuarios') totalUsuarios: number) {
     return this.groupService.applyNEuro(groupId, nEuro, totalUsuarios);
+  }
+
+  @Put(':groupId/updateTotalNEuro')
+  @HttpCode(200)
+  async updateTotalNEuro() {
+    await this.groupService.updateTotalNEuro();
+    return { message: 'totalNEuro atualizado com sucesso' };
   }
 
   @Post(':id/next-round')
