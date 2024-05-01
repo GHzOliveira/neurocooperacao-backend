@@ -44,4 +44,4 @@ RUN npx prisma migrate deploy
 EXPOSE 3000
 
 # Defina o comando para iniciar o aplicativo
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main.js"]
