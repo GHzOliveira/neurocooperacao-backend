@@ -35,6 +35,9 @@ RUN npm ci --only=production
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 
+# Defina a variável de ambiente DATABASE_URL
+ENV DATABASE_URL="postgresql://neuro:neuro@localhost:5432/nest-neuro?schema=public"
+
 # Execute as migrações do Prisma
 RUN npx prisma migrate deploy
 
