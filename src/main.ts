@@ -5,7 +5,7 @@ import { Server } from 'socket.io';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-  const server = await app.listen(3000);
+  const server = await app.listen(3333);
 
   const ioServer = new Server(server, {
     cors: {
