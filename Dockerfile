@@ -32,7 +32,7 @@ COPY package*.json ./
 RUN npm ci --only=production
 
 # Copie os arquivos de construção do estágio de construção
-COPY --from=build /app/dist ./dist
+COPY --from=build /dist ./dist
 COPY --from=build /app/prisma ./prisma
 
 ENV DATABASE_URL="postgresql://neondb_owner:JgnFV0QKvot7@ep-sweet-glitter-a5qf2a17.us-east-2.aws.neon.tech/neondb?sslmode=require"
