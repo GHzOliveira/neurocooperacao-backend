@@ -8,46 +8,73 @@ datasource db {
 }
 
 model Admin {
-  id      String @id @default(uuid())
-  user    String @unique
+  id       String @id @default(uuid())
+  user     String @unique
   password String
 
   @@map("admin")
 }
 
 model Grupo {
-  id     String @id @default(uuid())
-  nome  String @unique
-  gameServerCreated Boolean @default(false) @map("game_server_created")
-  gameRule String? @map("game_rule")
-  rodada Rodada[]
-  user User[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
-  
+  id                String    @id @default(uuid())
+  nome              String    @unique
+  gameServerCreated Boolean   @default(false) @map("game_server_created")
+  gameRule          String?   @map("game_rule")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @map("updated_at")
+  rodada            Rodada[]
+  user              User[]
+  valores           Valores[]
+
   @@map("group")
 }
 
 model Rodada {
-  id     String @id @default(uuid())
-  nEuro String
-  retribuicao String
+  id             String   @id @default(uuid())
+  nEuro          String
+  retribuicao    String
   qntRetribuicao String
-  nRodada String
-  group  Grupo @relation(fields: [groupId], references: [id])
-  groupId String
-  data   DateTime
+  nRodada        String
+  groupId        String
+  data           DateTime
+  group          Grupo    @relation(fields: [groupId], references: [id])
 }
 
 model User {
-  id        String @id @default(uuid())
-  nome      String
-  whatsapp  String
-  nEuro    String? @map("n_euro")
-  grupo     Grupo  @relation(fields: [grupoId], references: [id])
-  grupoId   String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  id          String        @id @default(uuid())
+  nome        String
+  whatsapp    String
+  nEuro       String?       @map("n_euro")
+  grupoId     String
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @default(now()) @map("updated_at")
+  transaction Transaction[]
+  grupo       Grupo         @relation(fields: [grupoId], references: [id])
 
   @@map("user")
+}
+
+model Valores {
+  id            String   @id @default(uuid())
+  totalNEuro    String   @map("total_n_euro")
+  totalUsuarios Int      @map("total_usuarios")
+  fundoRetido   String   @map("fundo_retido")
+  grupoId       String
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @map("'updated_at")
+  grupo         Grupo    @relation(fields: [grupoId], references: [id])
+
+  @@map("valores")
+}
+
+model Transaction {
+  id              String   @id @default(uuid())
+  userId          String
+  roundId         String
+  transactionType String
+  amount          String
+  timestamp       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@map("transaction")
 }

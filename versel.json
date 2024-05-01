@@ -6,5 +6,6 @@
         "src": "Dockerfile",
         "use": "@vercel/docker"
       }
-    ]
+    ],
+    "outputDirectory": "dist"
   }
