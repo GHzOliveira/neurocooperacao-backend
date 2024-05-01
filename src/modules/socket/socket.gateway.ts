@@ -7,9 +7,10 @@ import {
 } from '@nestjs/websockets';
 import { subscribe } from 'diagnostics_channel';
 import { Server, Socket } from 'socket.io';
+import { createAdapter } from 'socket.io-redis';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-@WebSocketGateway(3000, { cors: { origin: '*', methods: ['GET', 'POST'] } })
+@WebSocketGateway(3000, { cors: { origin: 'https://neurocooperacao-backend-8o0wti1lu-ghzoliveiras-projects.vercel.app', methods: ['GET', 'POST'] } })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
