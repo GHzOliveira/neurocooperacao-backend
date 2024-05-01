@@ -8,7 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-@WebSocketGateway(3000, { cors: { origin: 'http://35.160.120.126', methods: ['GET', 'POST', 'PUT', 'PATCH'] } })
+@WebSocketGateway(3000, { cors: { origin: 'https://neurocooperacao-backend.onrender.com', methods: ['GET', 'POST', 'PUT', 'PATCH'] } })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
