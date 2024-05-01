@@ -41,5 +41,8 @@ RUN npx prisma migrate deploy
 # Exponha a porta que o aplicativo usa
 EXPOSE 3000
 
+# Defina o comando para iniciar o aplicativo e executar as migrações do Prisma
+CMD npx prisma migrate deploy && node dist/main
+
 # Defina o comando para iniciar o aplicativo
 CMD ["node", "dist/main"]
