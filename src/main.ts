@@ -1,10 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { CorsMiddleware } from 'middlewares/cors.middleware';
+import { Server } from 'socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-  await app.listen(3333);
+  const server = await app.listen(3333);
+
+  const ioServer = new Server(server, {
+    cors: {
+      origin: '*',
+    },
+  });
 }
 bootstrap();
