@@ -5,11 +5,10 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { subscribe } from 'diagnostics_channel';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-@WebSocketGateway(3000, { cors: { origin: '*', methods: ['GET', 'POST'] } })
+@WebSocketGateway(3000, { cors: { origin: 'https://neurocooperacao-backend.onrender.com', methods: ['GET', 'POST', 'PUT', 'PATCH'] } })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
