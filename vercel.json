@@ -3,8 +3,8 @@
     "name": "neurocoperacao-backend",
     "builds": [
       {
-        "src": "Dockerfile",
-        "use": "@vercel/docker"
+        "src": "dist/main.ts",
+        "use": "@vercel/node"
       }
     ],
     "routes": [
