@@ -38,10 +38,10 @@ COPY --from=build /app/prisma ./prisma
 ENV DATABASE_URL="postgresql://neondb_owner:JgnFV0QKvot7@ep-sweet-glitter-a5qf2a17.us-east-2.aws.neon.tech/neondb?sslmode=require"
 
 # Execute as migrações do Prisma
-RUN npx prisma migrate deploy
+RUN npx prisma generate && npx prisma migrate deploy
 
 # Exponha a porta que o aplicativo usa
 EXPOSE 3000
 
 # Defina o comando para iniciar o aplicativo
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]
