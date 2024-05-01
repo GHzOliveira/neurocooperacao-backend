@@ -10,8 +10,6 @@ COPY . .
 # Copie os arquivos package.json e package-lock.json
 COPY package*.json ./
 
-RUN npm install -g npm@latest
-
 # Instale as dependências do projeto
 RUN npm install --quiet --no-optional --no-fund --loglevel=error
 
