@@ -8,12 +8,12 @@ async function bootstrap() {
     origin: '*',
     allowedHeaders: 'Content-Type, Authorization',
   });
-  const server = await app.listen(3333);
+ await app.listen(process.env.PORT || 3333);
 
-  const ioServer = new Server(server, {
-    cors: {
-      origin: '*',
-    },
-  });
+  // const ioServer = new Server(server, {
+  //   cors: {
+  //     origin: '*',
+  //   },
+  // });
 }
 bootstrap();
