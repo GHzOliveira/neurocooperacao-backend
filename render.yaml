@@ -11,6 +11,4 @@ services:
     sync: false
   region: oregon
   dockerContext: .
-  dockerfilePath: ./Dockerfile
-  rootDir: src
 version: "1"

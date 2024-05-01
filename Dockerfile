@@ -31,6 +31,9 @@ RUN npm ci --only=production
 # Copie os arquivos de construção do estágio de construção
 COPY --from=build /app/dist ./dist
 
+# Execute as migrações do Prisma
+RUN npx prisma migrate deploy
+
 # Exponha a porta que o aplicativo usa
 EXPOSE 3000
 
