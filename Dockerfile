@@ -35,7 +35,7 @@ RUN npm ci --only=production
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 
-ENV DATABASE_URL="postgresql://neondb_owner:JgnFV0QKvot7@ep-sweet-glitter-a5qf2a17.us-east-2.aws.neon.tech/neondb?sslmode=require"
+ENV DATABASE_URL="postgresql://neuro_owner:7ctwpzlxR6VG@ep-gentle-morning-a4kstzpn.us-east-1.aws.neon.tech/neuro?sslmode=require"
 
 # Execute as migrações do Prisma
 RUN npx prisma generate && npx prisma migrate deploy
