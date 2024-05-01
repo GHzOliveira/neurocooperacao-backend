@@ -1,33 +1,24 @@
-# Use a imagem oficial do Node.js para a etapa de construção
-FROM node:16-alpine as build
+FROM node:14 AS builder
 
-# Defina o diretório de trabalho
+# Create app directory
 WORKDIR /app
 
-# Copie os arquivos de código fonte
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Install app dependencies
+RUN npm install
+
 COPY . .
 
-# Instale as dependências do projeto
-RUN npm install --quiet --no-optional --no-fund --loglevel=error
-
-# Gere o cliente Prisma
-RUN npx prisma generate
-
-# Construa o aplicativo
 RUN npm run build
 
-# Copie os arquivos de construção do estágio de construção
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
+FROM node:14
 
-ENV DATABASE_URL="postgresql://neondb_owner:JgnFV0QKvot7@ep-sweet-glitter-a5qf2a17.us-east-2.aws.neon.tech/neondb?sslmode=require"
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/dist ./dist
 
-# Execute as migrações do Prisma
-RUN npx prisma migrate deploy
-
-# Exponha a porta que o aplicativo usa
 EXPOSE 3000
-
-# Defina o comando para iniciar o aplicativo
-CMD ["node", "dist/main.js"]
+CMD [ "npm", "run", "start:prod" ]
