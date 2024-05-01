@@ -8,8 +8,7 @@ async function bootstrap() {
     origin: '*',
     allowedHeaders: 'Content-Type, Authorization',
   });
-  const port = process.env.APP_PORT || 3333;
-  const server = await app.listen(port);
+  const server = await app.listen(3333);
 
   const ioServer = new Server(server, {
     cors: {
