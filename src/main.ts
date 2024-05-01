@@ -4,7 +4,7 @@ import { CorsMiddleware } from 'middlewares/cors.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(CorsMiddleware);
+  app.enableCors();
   await app.listen(3333);
 }
 bootstrap();
