@@ -4,14 +4,16 @@ FROM node:16-alpine as build
 # Defina o diretório de trabalho
 WORKDIR /app
 
+# Copie os arquivos de código fonte
+COPY . .
+
 # Copie os arquivos package.json e package-lock.json
 COPY package*.json ./
 
-# Instale as dependências do projeto
-RUN npm ci
+RUN npm install -g npm@latest
 
-# Copie os arquivos de código fonte
-COPY . .
+# Instale as dependências do projeto
+RUN npm install --quiet --no-optional --no-fund --loglevel=error
 
 # Gere o cliente Prisma
 RUN npx prisma generate
