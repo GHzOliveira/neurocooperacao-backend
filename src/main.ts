@@ -1,13 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { CorsMiddleware } from 'middlewares/cors.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: 'https://jogo-neurocooperacao.vercel.app',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
+  app.use(CorsMiddleware);
   await app.listen(3333);
 }
 bootstrap();
