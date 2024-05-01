@@ -7,6 +7,9 @@ CREATE TABLE "admin" (
     CONSTRAINT "admin_pkey" PRIMARY KEY ("id")
 );
 
+-- INSERT INTO ADMIN
+INSERT INTO "admin" ("id", "user", "password") VALUES ('1', 'admin', 'neuro')
+
 -- CreateTable
 CREATE TABLE "group" (
     "id" TEXT NOT NULL,
