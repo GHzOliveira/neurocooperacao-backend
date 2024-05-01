@@ -10,6 +10,9 @@ COPY package*.json ./
 # Instale as dependências do projeto
 RUN npm ci
 
+# Gere o cliente Prisma
+RUN npx prisma generate
+
 # Copie os arquivos de código fonte
 COPY . .
 
