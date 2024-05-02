@@ -100,49 +100,51 @@ export class GroupService {
 
   async deleteGroup(id: string) {
     const users = await this.prisma.user.findMany({
-      where: {
-        grupoId: id,
-      },
-      select: {
-        id: true,
-      },
-    });
-    for (const user of users) {
-      await this.prisma.transaction.deleteMany({
         where: {
-          userId: user.id,
+            grupoId: id,
         },
-      });
-    }
-    await this.prisma.user.deleteMany
-    ({
-      where: {
-        grupoId: id,
-      },
+        select: {
+            id: true,
+        },
     });
-    await this.prisma.rodada.deleteMany({
-      where: {
-        groupId: id,
-      },
-    });
-    await this.prisma.valores.deleteMany({
-      where: {
-        grupoId: id,
-      },
-    });
-    await this.prisma.transaction.deleteMany({
-      where: {
-        user: {
-          grupoId: id,
-        }
-      },
-    })
-    return this.prisma.grupo.delete({
-      where: {
-        id: id,
-      },
-    });
-  }
+
+    const userDeletions = users.map(user => this.prisma.transaction.deleteMany({
+        where: {
+            userId: user.id,
+        },
+    }));
+
+    return this.prisma.$transaction([
+        ...userDeletions,
+        this.prisma.user.deleteMany({
+            where: {
+                grupoId: id,
+            },
+        }),
+        this.prisma.rodada.deleteMany({
+            where: {
+                groupId: id,
+            },
+        }),
+        this.prisma.valores.deleteMany({
+            where: {
+                grupoId: id,
+            },
+        }),
+        this.prisma.transaction.deleteMany({
+            where: {
+                user: {
+                    grupoId: id,
+                }
+            },
+        }),
+        this.prisma.grupo.delete({
+            where: {
+                id: id,
+            },
+        }),
+    ]);
+}
 
   async updateGroup(id: string, data: UpdateGroupDto) {
     return this.prisma.grupo.update({
