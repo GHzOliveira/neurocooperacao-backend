@@ -226,6 +226,7 @@ export class GroupService {
 
     if (user && user.nEuro) {
       const newNEuro = parseFloat(user.nEuro) - parseFloat(nEuro);
+      console.log(`New nEuro for user ${user.id}: ${newNEuro}`);
       await this.prisma.user.update({
         where: { id: user.id },
         data: { nEuro: newNEuro.toString() },
