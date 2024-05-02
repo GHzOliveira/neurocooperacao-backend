@@ -3,18 +3,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGroupDto, UpdateGroupDto } from './dto/create-group.dto';
 import { Prisma, PrismaPromise, Rodada } from '@prisma/client';
 
-import * as winston from 'winston';
-
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  defaultMeta: { service: 'user-service' },
-  transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
-  ],
-});
-
 @Injectable()
 export class GroupService {
   constructor(private prisma: PrismaService) {}
@@ -238,21 +226,16 @@ export class GroupService {
     });
 
     if (user && user.nEuro) {
-      const currentNEuro = parseInt(user.nEuro) || 0;
-      const nEuroNumber = parseInt(nEuro);
-      if (isNaN(nEuroNumber)) {
-        throw new Error('nEuro deve ser um número');
-      }
-      const newNEuro = Math.max(0, currentNEuro - nEuroNumber);
-      logger.info(`Current nEuro: ${currentNEuro}, nEuro to apply: ${nEuroNumber}, new nEuro: ${newNEuro}`);
+      const currentNEuro = user.nEuro ? parseFloat(user.nEuro) : 0;
+      const newNEuro = currentNEuro - parseFloat(nEuro);
 
-      await this.prisma.user.update({
+      const debug = await this.prisma.user.update({
         where: { id: user.id },
         data: { nEuro: newNEuro.toString() },
       });
       userNEuro = newNEuro.toString()
+      console.log('debugger', debug);
     }
-
     let valores = await this.prisma.valores.findFirst({
       where: { grupoId: groupId },
     });
@@ -267,9 +250,8 @@ export class GroupService {
         },
       });
     } else {
-      const totalNEuro = (parseInt(valores.totalNEuro) || 0) + parseInt(nEuro);
+      const totalNEuro = parseFloat(valores.totalNEuro) + parseFloat(nEuro);
       const newTotalUsuarios = (valores.totalUsuarios || 0) + (totalUsuarios || 0);
-      logger.info(`Total nEuro: ${totalNEuro}, totalUsuarios: ${newTotalUsuarios}`);
       valores = await this.prisma.valores.update({
         where: { id: valores.id },
         data: { totalNEuro: totalNEuro.toString(), totalUsuarios: newTotalUsuarios },
