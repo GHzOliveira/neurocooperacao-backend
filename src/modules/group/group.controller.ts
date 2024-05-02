@@ -90,6 +90,7 @@ export class GroupController {
 
   @Patch(':groupId/applyNEuro')
   async applyNEuro(@Param('groupId') groupId: string, @Body('nEuro') nEuro: string, @Body('totalUsuarios') totalUsuarios: number) {
+    console.log('groupId', groupId, 'nEuro', nEuro, 'totalUsuarios', totalUsuarios)
     return this.groupService.applyNEuro(groupId, nEuro, totalUsuarios);
   }
 
