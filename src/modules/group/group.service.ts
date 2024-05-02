@@ -227,7 +227,11 @@ export class GroupService {
 
     if (user && user.nEuro) {
       const currentNEuro = parseInt(user.nEuro) || 0;
-      const newNEuro = Math.max(0, currentNEuro - parseInt(nEuro));
+      const nEuroNumber = parseInt(nEuro);
+      if (isNaN(nEuroNumber)) {
+        throw new Error('nEuro deve ser um número');
+      }
+      const newNEuro = Math.max(0, currentNEuro - nEuroNumber);
 
       await this.prisma.user.update({
         where: { id: user.id },
