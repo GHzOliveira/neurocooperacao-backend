@@ -220,6 +220,7 @@ export class GroupService {
   }
 
   async applyNEuro(groupId: string, nEuro: string, totalUsuarios?: number) {
+    let userNEuro
     const user = await this.prisma.user.findFirst({
       where: { grupoId: groupId },
     });
@@ -231,6 +232,7 @@ export class GroupService {
         where: { id: user.id },
         data: { nEuro: newNEuro.toString() },
       });
+      userNEuro = newNEuro.toString()
     }
 
     let valores = await this.prisma.valores.findFirst({
@@ -255,7 +257,7 @@ export class GroupService {
       });
     }
 
-    return valores;
+    return { ...valores, userNEuro };
   }
 
   async getNEuroStats(): Promise<{ average: number; median: number; mode: number }> {
