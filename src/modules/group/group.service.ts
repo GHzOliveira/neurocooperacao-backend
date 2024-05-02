@@ -226,8 +226,8 @@ export class GroupService {
     });
 
     if (user && user.nEuro) {
-      const currentNEuro = user.nEuro ? parseFloat(user.nEuro) : 0;
-      const newNEuro = currentNEuro - parseFloat(nEuro);
+      const currentNEuro = parseInt(user.nEuro) || 0;
+      const newNEuro = Math.max(0, currentNEuro - parseInt(nEuro));
 
       await this.prisma.user.update({
         where: { id: user.id },
@@ -250,7 +250,7 @@ export class GroupService {
         },
       });
     } else {
-      const totalNEuro = parseFloat(valores.totalNEuro) + parseFloat(nEuro);
+      const totalNEuro = (parseInt(valores.totalNEuro) || 0) + parseInt(nEuro);
       const newTotalUsuarios = (valores.totalUsuarios || 0) + (totalUsuarios || 0);
       valores = await this.prisma.valores.update({
         where: { id: valores.id },
