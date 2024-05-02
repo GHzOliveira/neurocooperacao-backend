@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGroupDto, UpdateGroupDto } from './dto/create-group.dto';
-import { Prisma, Rodada } from '@prisma/client';
+import { Prisma, PrismaPromise, Rodada } from '@prisma/client';
 
 @Injectable()
 export class GroupService {
@@ -99,6 +99,14 @@ export class GroupService {
   }
 
   async deleteGroup(id: string) {
+    const group = await this.prisma.grupo.findUnique({
+        where: { id: id },
+    });
+
+    if (!group) {
+        throw new Error(`Group with id ${id} not found`);
+    }
+
     const users = await this.prisma.user.findMany({
         where: {
             grupoId: id,
@@ -108,11 +116,15 @@ export class GroupService {
         },
     });
 
-    const userDeletions = users.map(user => this.prisma.transaction.deleteMany({
-        where: {
-            userId: user.id,
-        },
-    }));
+    let userDeletions: PrismaPromise<any>[] = [];
+
+    if (users.length > 0) {
+        userDeletions = users.map(user => this.prisma.transaction.deleteMany({
+            where: {
+                userId: user.id,
+            },
+        }));
+    }
 
     return this.prisma.$transaction([
         ...userDeletions,
