@@ -95,8 +95,36 @@ export class GroupService {
       });
     }
 
+    // Obtenha a última rodada
+  const lastRodada = data.rodada[data.rodada.length - 1];
+  const newNRodada = parseInt(lastRodada.nRodada, 10) + 1;
+
+  // Crie uma nova rodada com os mesmos dados da última, mas com o número da rodada incrementado
+  await this.prisma.rodada.create({
+    data: {
+      groupId: group.id,
+      nEuro: lastRodada.nEuro,
+      retribuicao: lastRodada.retribuicao,
+      qntRetribuicao: lastRodada.qntRetribuicao,
+      nRodada: newNRodada.toString(), // incrementa o número da rodada
+      data: new Date(),
+    },
+  });
+
     return group;
   }
+
+  async getHighestNRodada(): Promise<String> {
+    const allRounds = await this.prisma.rodada.findMany({
+      select: {
+        nRodada: true,
+      },
+    });
+
+    const maxNRodada = Math.max(...allRounds.map(round => Number(round.nRodada)));
+    return maxNRodada.toString();
+  }
+
 
   async deleteGroup(id: string) {
     const group = await this.prisma.grupo.findUnique({
@@ -219,13 +247,18 @@ export class GroupService {
     return user?.nEuro;
   }
 
-  async getTransaction(id: string) {
-    return this.prisma.transaction.findUnique({
-      where: {
-        id: id,
-      },
+  async getTransaction(userId: string) {
+    const transactions =  this.prisma.transaction.findMany({
+        where: {
+            userId: userId,
+        },
+        orderBy: {
+            roundId: 'asc',
+        },
     });
-  }
+    
+    return transactions;
+}
 
   async applyNEuro(userId: string, groupId: string, nEuro: string, totalUsuarios?: number) {
     return this.prisma.$transaction(async (prisma) => {

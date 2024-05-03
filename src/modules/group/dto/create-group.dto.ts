@@ -1,4 +1,4 @@
-import { IsArray, IsInt, IsObject, IsString, Min, isInt, isString } from "class-validator";
+import { IsArray, IsObject, IsString } from "class-validator";
 
 class RodadaDto {
     @IsString()
