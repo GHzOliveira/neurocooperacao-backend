@@ -59,6 +59,11 @@ export class GroupController {
     return this.groupService.getTransaction(id);
   }
 
+  @Get(':id/nEuro')
+  async getNEuro(@Param('id') id: string): Promise<string | null> {
+    return this.groupService.getNEuro(id);
+  }
+
   @Post(':userId/transaction')
   async createTransaction(
     @Param('userId') userId: string,
@@ -89,8 +94,13 @@ export class GroupController {
   }
 
   @Patch(':groupId/applyNEuro')
-  async applyNEuro(@Param('groupId') groupId: string, @Body('nEuro') nEuro: string, @Body('totalUsuarios') totalUsuarios: number) {
-    return this.groupService.applyNEuro(groupId, nEuro, totalUsuarios);
+  async applyNEuro(
+    @Body('userId') userId: string,
+    @Param('groupId') groupId: string,
+    @Body('nEuro') nEuro: string,
+    @Body('totalUsuarios') totalUsuarios: number
+  ) {
+    return this.groupService.applyNEuro(userId, groupId, nEuro, totalUsuarios);
   }
 
   @Put(':groupId/updateTotalNEuro')
@@ -101,7 +111,7 @@ export class GroupController {
   }
 
   @Post(':id/next-round')
-  async nextRound(@Param('id') id: string) {
-    return this.groupService.nextRound(id);
+  async nextRound(@Param('id') id: string, @Body('nEuro') nEuro: string) {
+    return this.groupService.nextRound(id, nEuro);
   }
 }
