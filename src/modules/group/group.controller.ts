@@ -54,14 +54,19 @@ export class GroupController {
     return this.groupService.getNEuroStats();
   }
 
-  @Get(':id/transaction')
-  async getTransaction(@Param('id') id: string) {
-    return this.groupService.getTransaction(id);
+  @Get(':userId/transaction')
+  async getTransaction(@Param('userId') userId: string){
+      return this.groupService.getTransaction(userId);
   }
 
   @Get(':id/nEuro')
   async getNEuro(@Param('id') id: string): Promise<string | null> {
     return this.groupService.getNEuro(id);
+  }
+
+  @Get(':groupId/highest-nrodada')
+  async getHighestNRodada(): Promise<String> {
+    return this.groupService.getHighestNRodada();
   }
 
   @Post(':userId/transaction')
