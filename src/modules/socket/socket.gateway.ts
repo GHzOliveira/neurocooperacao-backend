@@ -21,11 +21,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private prisma: PrismaService) { }
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log(`Client connected: ${client.id}`);
+    // console.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    // console.log(`Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('createGame')
@@ -53,10 +53,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     gameServer.on('connection', (socket) => {
-      console.log(`Usuário conectado ao servidor de jogo do grupo ${groupId}`);
+      // console.log(`Usuário conectado ao servidor de jogo do grupo ${groupId}`);
     });
 
-    console.log(`Servidor de jogo criado para o grupo ${groupId}`);
+    // console.log(`Servidor de jogo criado para o grupo ${groupId}`);
     client.emit('gameCreated', groupId);
   }
 
@@ -64,12 +64,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleMessage(client: Socket, payload: string, groupId: string): void {
     const message = (this.messages[client.id] = payload);
     if (message) {
-      console.log(
-        `Emitindo 'storedMessage' para o cliente '${client.id}' com a mensagem: '${message}', `,
-      );
+      // console.log(
+      //   `Emitindo 'storedMessage' para o cliente '${client.id}' com a mensagem: '${message}', `,
+      // );
       this.server.emit('storedMessage', message);
     }
-    console.log(`Mensagem recebida do cliente ${client.id}}: ${payload}`);
+    // console.log(`Mensagem recebida do cliente ${client.id}}: ${payload}`);
   }
 
   @SubscribeMessage('nextRound')
@@ -78,7 +78,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.messages[client.id] = message;
     this.server.emit('nextRoundStarted', groupId);
 
-    console.log(`Message stored: ${message}`);
+    // console.log(`Message stored: ${message}`);
   }
 
   @SubscribeMessage('endGame')
@@ -87,7 +87,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.messages[client.id] = message;
     this.server.emit('Acabou', groupId);
 
-    console.log(`Message stored: ${message}`);
+    // console.log(`Message stored: ${message}`);
   }
 
   @SubscribeMessage('sendGameRule')
@@ -95,15 +95,15 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client: Socket,
     [gameRule, groupId]: [string, string],
   ): Promise<void> {
-    console.log(`Regra do jogo recebida do cliente ${client.id}: ${gameRule}`);
+    // console.log(`Regra do jogo recebida do cliente ${client.id}: ${gameRule}`);
     try {
       await this.prisma.grupo.update({
         where: { id: groupId },
         data: { gameRule: gameRule },
       });
-      console.log(
-        `Regra do jogo armazenada no banco de dados para a rodada ${groupId}`,
-      );
+      // console.log(
+      //   `Regra do jogo armazenada no banco de dados para a rodada ${groupId}`,
+      // );
       this.server.emit('gameRuleStored', gameRule);
     } catch (error) {
       console.error(
@@ -132,9 +132,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameServerSockets.get(groupId).push(client);
 
     gameServer.emit('newPlayer', client.id);
-    console.log(
-      `Usuário ${client.id} entrou no servidor de jogo do grupo ${groupId}`,
-    );
+    // console.log(
+    //   `Usuário ${client.id} entrou no servidor de jogo do grupo ${groupId}`,
+    // );
   }
 
   @SubscribeMessage('startGame')
@@ -153,6 +153,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
 
-    console.log(`Jogo iniciado para o grupo ${groupId}`);
+    // console.log(`Jogo iniciado para o grupo ${groupId}`);
   }
 }
