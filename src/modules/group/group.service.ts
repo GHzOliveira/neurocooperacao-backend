@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateGroupDto, UpdateGroupDto } from './dto/create-group.dto';
-import { Prisma, PrismaPromise, Rodada, User } from '@prisma/client';
+import { Prisma, PrismaPromise, Rodada } from '@prisma/client';
 
 @Injectable()
 export class GroupService {
@@ -184,6 +184,59 @@ export class GroupService {
             },
         }),
     ]);
+}
+
+async deleteUsersByGroupId(groupId: string) {
+  const users = await this.prisma.user.findMany({
+    where: {
+      grupoId: groupId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (users.length === 0) {
+    throw new Error(`Nenhum usuário encontrado para o grupo com ID ${groupId}`);
+  }
+
+  const userDeletions = users.map(user => 
+    this.prisma.user.delete({
+      where: {
+        id: user.id,
+      },
+    })
+  );
+
+  await this.prisma.$transaction(userDeletions);
+
+  await this.prisma.valores.updateMany({
+    where: { grupoId: groupId },
+    data: { totalUsuarios: 0 },
+  });
+
+  return { message: `Todos os usuários do grupo com ID ${groupId} foram deletados` };
+}
+
+async resetValoresByGroupId(groupId: string) {
+  const valores = await this.prisma.valores.findFirst({
+    where: { grupoId: groupId },
+  });
+
+  if (!valores) {
+    throw new Error(`Valores para o grupo com ID ${groupId} não encontrados`);
+  }
+
+  await this.prisma.valores.update({
+    where: { id: valores.id },
+    data: {
+      totalNEuro: '0',
+      totalUsuarios: 0,
+      fundoRetido: '0',
+    },
+  });
+
+  return { message: `Campos totalNEuro, totalUsuarios e fundoRetido foram zerados para o grupo com ID ${groupId}.` };
 }
 
   async updateGroup(id: string, data: UpdateGroupDto) {

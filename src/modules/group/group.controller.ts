@@ -8,7 +8,6 @@ import {
   Patch,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto, UpdateGroupDto } from './dto/create-group.dto';
@@ -82,6 +81,16 @@ export class GroupController {
   @Delete(':id')
   deleteGroup(@Param('id') id: string) {
     return this.groupService.deleteGroup(id);
+  }
+
+  @Delete(':id/users')
+  async deleteUsersByGroupId(@Param('id') id: string) {
+    return this.groupService.deleteUsersByGroupId(id);
+  }
+
+  @Patch(':id/reset-valores')
+  async resetValoresByGroupId(@Param('id') id: string) {
+    return this.groupService.resetValoresByGroupId(id);
   }
 
   @Put(':id')
